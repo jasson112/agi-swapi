@@ -1,0 +1,51 @@
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/tour-operator/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/phpunit-bridge ###
+.phpunit
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/webpack-encore-pack ###
+/node_modules/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-pack ###
+# Created by .ignore support plugin (hsz.mobi)
+/.idea/
+/.vagrant/
+/impulse.box
+/php/.idea/
+!/var/jwt/
+*.zip
+*.log
+venv
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+/composer.lock
+/symfony.lock
+/yarn.lock
+
+###> liip/imagine-bundle ###
+/public/media/cache/
+###< liip/imagine-bundle ###
+/tour-operator/uploads2/
+
+###> symfony/webpack-encore-bundle ###
+###< symfony/webpack-encore-bundle ###
+/tour-operator/build/*
+/tour-operator/tmp/*
+/tour-operator/tmp/
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
