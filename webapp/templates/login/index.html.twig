@@ -1,25 +1,50 @@
-{# templates/login/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{# ... #}
-
 {% block body %}
-    {% if error %}
-        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
-
-    <form action="{{ path('login') }}" method="post">
-        <label for="username">Email:</label>
-        <input type="text" id="username" name="_username" value="{{ last_username }}"/>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="_password"/>
-
-        {# If you want to control the URL the user is redirected to on success
+    <div class="columns is-multiline is-desktop is-vcentered">
+        <div class="column is-one-quarter">
+            <figure class="image is-1by1">
+                <img  src="https://media4.giphy.com/media/zhPWlqR2CUQ6s/giphy.gif?cid=ecf05e47k9hfdt0nstasd2ad34y6t9hugb3bfb7gohl5iw2q&rid=giphy.gif&ct=g">
+            </figure>
+        </div>
+        <div class="column">
+            {% if error %}
+                <article class="message is-danger">
+                    <div class="message-body">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                </article>
+            {% endif %}
+            <form action="{{ path('login') }}" method="post">
+                <div class="field">
+                    <label class="label">Username</label>
+                    <p class="control is-expanded has-icons-left">
+                        <input class="input" type="text" id="username" name="_username" value="{{ last_username }}"/>
+                        <span class="icon is-small is-left">
+                          <i class="fa fa-user"></i>
+                        </span>
+                    </p>
+                </div>
+                <div class="field">
+                    <label class="label">Password</label>
+                    <p class="control is-expanded has-icons-left has-icons-right">
+                        <input class="input" type="password" id="password" name="_password" placeholder="Password"/>
+                        <span class="icon is-small is-left">
+                          <i class="fa fa-lock"></i>
+                        </span>
+                    </p>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary" type="submit">
+                            Login
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                {# If you want to control the URL the user is redirected to on success
         <input type="hidden" name="_target_path" value="/account"/> #}
-
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-        <button type="submit">login</button>
-    </form>
+            </form>
+        </div>
+    </div>
 {% endblock %}
