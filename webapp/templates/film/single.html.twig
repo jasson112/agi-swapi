@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <h1 class="title is-1">{{ film.title }}</h1>
+    <div class="columns is-multiline is-desktop is-vcentered">
+        <div class="column is-one-quarter">
+            <figure class="image is-1by1">
+                <img src="https://picsum.photos/1280/960" alt="Placeholder image">
+            </figure>
+        </div>
+        <div class="column">
+            <div class="content">
+                <h3>Director:</h3>
+                <p>{{ film.director }}</p>
+                <h3>Release date:</h3>
+                <p>{{ film.releaseDate|date("m/d/Y") }}</p>
+
+            </div>
+        </div>
+    </div>
+    <h2 class="title is-2">People:</h2>
+    <div class="columns is-multiline is-desktop is-vcentered is-centered">
+        {% for character in characters %}
+            <div class="column is-one-quarter">
+                <a href="">
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image is-4by3">
+                                <img src="https://picsum.photos/1280/960?random={{ loop.index }}" alt="Placeholder image">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <p class="title is-4">{{ character.name }}</p>
+                            <p class="subtitle is-6">{{ character.gender }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

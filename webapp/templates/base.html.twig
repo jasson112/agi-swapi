@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
         {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
+            {{ encore_entry_link_tags('style') }}
         {% endblock %}
 
         {% block javascripts %}
@@ -14,6 +14,50 @@
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <section class="hero is-fullheight">
+            <div class="hero-head  has-background-info ">
+                <nav class="navbar">
+                    <div class="container">
+                        <div class="navbar-brand">
+                            <a class="navbar-item">
+                                <img src="https://i.giphy.com/media/c01Cu1ZSjCUtq/giphy.gif" alt="Logo">
+                            </a>
+                            <span class="navbar-burger" data-target="navbarMenuHeroB">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </span>
+                        </div>
+                        <div id="navbarMenuHeroB" class="navbar-menu">
+                            <div class="navbar-end">
+                                <a class="navbar-item is-active ">
+                                    Home
+                                </a>
+                                {% if app.user %}
+                                    <a class="navbar-item is-active " href="{{ path('films') }}">
+                                        Films
+                                    </a>
+                                    <a class="navbar-item is-active " href="{{ path('characters') }}">
+                                        Characters
+                                    </a>
+                                    <a class="navbar-item is-active " href="{{ path('clear_cache') }}">
+                                        Clear cache
+                                    </a>
+                                    <a class="navbar-item is-active " href="{{ path('app_logout') }}">
+                                        Logout
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="hero-body">
+                <div class="container">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </section>
     </body>
 </html>

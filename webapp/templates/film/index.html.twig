@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <h1 class="title">STAR WARS FILM LIST</h1>
+    <div class="columns is-multiline is-desktop is-vcentered is-centered">
+        {% for film in films %}
+            <div class="column is-one-quarter">
+                <a href="{{ path('film_single', {id: film.id}) }}">
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image is-4by3">
+                                <img src="https://picsum.photos/1280/960?random={{ loop.index }}" alt="Placeholder image">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <p class="title is-4">{{ film.title }}</p>
+                            <p class="subtitle is-6">{{ film.director }}</p>
+
+                            <div class="content">
+                                <time datetime="{{ film.releaseDate|date("m/d/Y") }}">{{ film.releaseDate|date("m/d/Y") }}</time>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

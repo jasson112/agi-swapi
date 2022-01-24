@@ -14,5 +14,12 @@
         "dev": "encore dev",
         "watch": "encore dev --watch",
         "build": "encore production --progress"
+    },
+    "dependencies": {
+        "bulma": "^0.9.3",
+        "font-awesome": "^4.7.0",
+        "normalize.css": "^8.0.1",
+        "sass": "^1.49.0",
+        "sass-loader": "^12.4.0"
     }
 }
