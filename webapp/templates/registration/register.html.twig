@@ -3,19 +3,77 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
-    {% for flashError in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flashError }}</div>
-    {% endfor %}
+<div class="columns is-multiline is-desktop is-vcentered">
+    <div class="column is-one-quarter">
+        <figure class="image is-1by1">
+            <img  src="https://media2.giphy.com/media/3orieKC8V5jJzIAfjG/giphy.gif?cid=ecf05e47iee4sx96gy9v2242wxky5swyyy8u1gjq0gfzjhal&rid=giphy.gif&ct=g">
+        </figure>
+    </div>
+    <div class="column">
+        {% for flashError in app.flashes('verify_email_error') %}
+            <article class="message is-danger">
+                <div class="message-body">
+                    {{ flashError }}
+                </div>
+            </article>
+        {% endfor %}
+        {{ form_start(registrationForm) }}
+        <div class="field">
+            <label class="label">Username</label>
+            <p class="control is-expanded has-icons-left">
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'input'}}) }}
+                <span class="icon is-small is-left">
+                  <i class="fa fa-user"></i>
+                </span>
+            </p>
+            {% if not registrationForm.email.vars.valid %}
+                <article class="message is-danger">
+                    <div class="message-body">
+                        {{ form_errors(registrationForm.email, {'attr': {'class': 'has-text-danger'}}) }}
+                    </div>
+                </article>
+            {% endif %}
+        </div>
 
-    <h1>Register</h1>
+        <div class="field">
+            <label class="label">Password</label>
+            <p class="control is-expanded has-icons-left">
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'input'}}) }}
+                <span class="icon is-small is-left">
+                          <i class="fa fa-lock"></i>
+                        </span>
+            </p>
+            {% if not registrationForm.plainPassword.vars.valid %}
+                <article class="message is-danger">
+                    <div class="message-body">
+                        {{ form_errors(registrationForm.plainPassword, {'attr': {'class': 'has-text-danger'}}) }}
+                    </div>
+                </article>
+            {% endif %}
+        </div>
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+        <label class="checkbox">
+            {{ form_widget(registrationForm.agreeTerms) }}
+            Agree Terms
+        </label>
+        {% if not registrationForm.agreeTerms.vars.valid %}
+            <article class="message is-danger">
+                <div class="message-body">
+                    {{ form_errors(registrationForm.agreeTerms, {'attr': {'class': 'has-text-danger'}}) }}
+                </div>
+            </article>
+        {% endif %}
+
+
+        <div class="field">
+            <div class="control">
+                <button class="button is-primary" type="submit">
+                    Register
+                </button>
+            </div>
+        </div>
+        {{ form_end(registrationForm) }}
+    </div>
+</div>
 {% endblock %}
