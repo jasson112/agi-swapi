@@ -21,7 +21,7 @@
     <div class="columns is-multiline is-desktop is-vcentered is-centered">
         {% for character in characters %}
             <div class="column is-one-quarter">
-                <a href="">
+                <a href="{{ path('character_single', {id: character.id}) }}">
                     <div class="card">
                         <div class="card-image">
                             <figure class="image is-4by3">

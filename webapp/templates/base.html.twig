@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}Agi Swapi !{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
         {% block stylesheets %}
             {{ encore_entry_link_tags('style') }}
@@ -19,8 +19,8 @@
                 <nav class="navbar">
                     <div class="container">
                         <div class="navbar-brand">
-                            <a class="navbar-item">
-                                <img src="https://i.giphy.com/media/c01Cu1ZSjCUtq/giphy.gif" alt="Logo">
+                            <a class="navbar-item" href="{{ path('home') }}">
+                                <img src="https://logodownload.org/wp-content/uploads/2015/12/star-wars-logo-3-1.png" alt="Logo">
                             </a>
                             <span class="navbar-burger" data-target="navbarMenuHeroB">
                                 <span></span>
@@ -30,7 +30,7 @@
                         </div>
                         <div id="navbarMenuHeroB" class="navbar-menu">
                             <div class="navbar-end">
-                                <a class="navbar-item is-active ">
+                                <a class="navbar-item is-active " href="{{ path('home') }}">
                                     Home
                                 </a>
                                 {% if app.user %}
@@ -41,7 +41,7 @@
                                         Characters
                                     </a>
                                     <a class="navbar-item is-active " href="{{ path('clear_cache') }}">
-                                        Clear cache
+                                        Clear api cache
                                     </a>
                                     <a class="navbar-item is-active " href="{{ path('app_logout') }}">
                                         Logout
