@@ -3,7 +3,7 @@
 namespace App\EventListener;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -16,7 +16,7 @@ class UserAgentSubscriber implements EventSubscriberInterface
     private $mailer;
     private $container;
 
-    public function __construct(LoggerInterface $logger, MailerInterface $mailer, Container $container)
+    public function __construct(LoggerInterface $logger, MailerInterface $mailer, ContainerInterface $container)
     {
         $this->logger = $logger;
         $this->mailer = $mailer;
