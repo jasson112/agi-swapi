@@ -6,12 +6,15 @@ use App\Entity\Character;
 use App\Entity\Film;
 use App\Repository\FilmRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Http\Discovery\HttpAsyncClientDiscovery;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AppController  extends AbstractController
 {
@@ -23,11 +26,10 @@ class AppController  extends AbstractController
     }
 
     /**
-     * @Route("/")
+     * @Route(name="home", path="/")
      */
     public function home(): Response
     {
-
         return $this->render('app/home.html.twig', [
             'number' => 10,
         ]);
@@ -42,10 +44,84 @@ class AppController  extends AbstractController
     }
 
     /**
-     * @Route(name="characters", path="/characters")
+     * @Route(name="character_single", path="/character/{id}")
      */
-    public function characters(ManagerRegistry $doctrine): Response{
-        $SWCharacterApiPath = 'https://swapi.dev/api/characters/';
+    public function character(ManagerRegistry $doctrine, $id): Response{
+        $character = $doctrine->getRepository(Character::class)->findFilms($id);
+        $SWCharApiPath = $character->getApiUrl();
+        $films = [];
+        try {
+            $httpClient = new HttplugClient();
+            $request = $httpClient->createRequest('GET', $SWCharApiPath);
+            $promise = $httpClient->sendAsyncRequest($request)
+                ->then(
+                    function (ResponseInterface $response) use ($doctrine, $character, $httpClient, &$films) {
+                        $SWApiFilms = json_decode($response->getBody());
+                        foreach ($SWApiFilms->films as $SWFilmApi){
+
+                            $cacheApi = $doctrine->getRepository(CacheApi::class)->findOneBy([
+                                'path' => $SWFilmApi
+                            ]);
+
+                            if(!$cacheApi){
+                                $charRequest = $httpClient->createRequest('GET', $SWFilmApi);
+                                //----------------
+                                $promise = $httpClient->sendAsyncRequest($charRequest)
+                                    ->then(
+                                        function (ResponseInterface $response) use ($doctrine, $SWFilmApi, $character, $httpClient, &$films) {
+                                            $SWApiFilm = json_decode($response->getBody());
+                                            $entityManager = $doctrine->getManager();
+                                            $film = $doctrine->getRepository(Film::class)->findOneBy([
+                                                'apiUrl' => $SWApiFilm->url
+                                            ]);
+                                            if(!$film){
+                                                $film = new Film();
+                                                $film->setTitle($SWApiFilm->title);
+                                                $film->setDirector($SWApiFilm->director);
+                                                $film->setReleaseDate(\DateTime::createFromFormat('Y-m-d', $SWApiFilm->release_date));
+                                                $film->setApiUrl($SWApiFilm->url);
+                                                $film->addCharacter($character);
+                                                $entityManager->persist($film);
+                                                $entityManager->flush();
+                                            }
+                                            array_push($films, $film);
+                                            $cacheApi = new CacheApi();
+                                            $cacheApi->setPath($SWFilmApi);
+                                            $entityManager->persist($cacheApi);
+                                            $entityManager->flush();
+                                            return $response;
+                                        },
+                                        function (\Throwable $exception) {
+                                            throw $exception;
+                                        }
+                                    );
+                                $promise->wait();
+                                //---------------
+                            }else{
+                                array_push($films, $doctrine->getRepository(Film::class)->findOneBy([
+                                    'apiUrl' => $SWFilmApi
+                                ]));
+                            }
+                        }
+                        return $response;
+                    },
+                    function (\Throwable $exception) {
+                        throw $exception;
+                    }
+                );
+            $promise->wait();
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
+        return $this->render('character/single.html.twig', compact('character', 'films'));
+    }
+
+    /**
+     * @Route(name="characters", path="/characters")
+     * @Route(name="characters_page", path="/characters/{page}")
+     */
+    public function characters(ManagerRegistry $doctrine, $page = 1): Response{
+        $SWCharacterApiPath = 'https://swapi.dev/api/people/?page=' . $page;
         $cacheApi = $doctrine->getRepository(CacheApi::class)->findOneBy([
             'path' => $SWCharacterApiPath
         ]);
@@ -57,12 +133,12 @@ class AppController  extends AbstractController
             try {
                 $promise = $httpClient->sendAsyncRequest($request)
                     ->then(
-                        function (ResponseInterface $response) use ($doctrine, $SWCharacterApiPath, $films) {
+                        function (ResponseInterface $response) use ($doctrine, $SWCharacterApiPath, &$characters) {
                             $SWApiCharacters = json_decode($response->getBody());
                             $entityManager = $doctrine->getManager();
                             foreach ($SWApiCharacters->results as $SWCharacter) {
                                 $character = $doctrine->getRepository(Character::class)->findOneBy([
-                                    'name' => $SWCharacter->name
+                                    'apiUrl' => $SWCharacter->url
                                 ]);
                                 if(!$character){
                                     $character = new Character();
@@ -80,7 +156,7 @@ class AppController  extends AbstractController
                             $entityManager->persist($cacheApi);
                             $entityManager->flush();
 
-                            return $response;
+                            //return $response;
                         },
                         function (\Throwable $exception) {
                             throw $exception;
@@ -91,10 +167,10 @@ class AppController  extends AbstractController
                 $this->logger->error($e->getMessage());
             }
         }else{
-            $films = $doctrine->getRepository(Film::class)->findAll();
+            $offset = ($page - 1) * 10;
+            $characters = $doctrine->getRepository(Character::class)->findBy([], [], 10, $offset);
         }
-
-        return $this->render('character/index.html.twig', compact('characters'));
+        return $this->render('character/index.html.twig', compact('characters', 'page'));
     }
 
     /**
@@ -113,7 +189,7 @@ class AppController  extends AbstractController
             try {
                 $promise = $httpClient->sendAsyncRequest($request)
                 ->then(
-                    function (ResponseInterface $response) use ($doctrine, $SWFilmApiPath, $films) {
+                    function (ResponseInterface $response) use ($doctrine, $SWFilmApiPath, &$films) {
                         $SWApiFilms = json_decode($response->getBody());
                         $entityManager = $doctrine->getManager();
                         foreach ($SWApiFilms->results as $SWFilm) {
@@ -160,13 +236,13 @@ class AppController  extends AbstractController
     public function film(ManagerRegistry $doctrine, $id): Response{
         $film = $doctrine->getRepository(Film::class)->findCharacters($id);
         $SWFilmApiPath = $film->getApiUrl();
-        $httpClient = new HttplugClient();
-        $request = $httpClient->createRequest('GET', $SWFilmApiPath);
-        $characters = $film->getCharacters()->toArray();
+        $characters = [];
         try {
+            $httpClient = new HttplugClient();
+            $request = $httpClient->createRequest('GET', $SWFilmApiPath);
             $promise = $httpClient->sendAsyncRequest($request)
                 ->then(
-                    function (ResponseInterface $response) use ($doctrine, $film, $httpClient, $characters) {
+                    function (ResponseInterface $response) use ($doctrine, $film, $httpClient, &$characters) {
                         $SWApiFilms = json_decode($response->getBody());
                         foreach ($SWApiFilms->characters as $SWCharacterApi){
                             $cacheApi = $doctrine->getRepository(CacheApi::class)->findOneBy([
@@ -177,11 +253,11 @@ class AppController  extends AbstractController
                                 //----------------
                                 $promise = $httpClient->sendAsyncRequest($charRequest)
                                     ->then(
-                                        function (ResponseInterface $response) use ($doctrine, $SWCharacterApi, $film, $httpClient, $characters) {
+                                        function (ResponseInterface $response) use ($doctrine, $SWCharacterApi, $film, $httpClient, &$characters) {
                                             $SWApiChar = json_decode($response->getBody());
                                             $entityManager = $doctrine->getManager();
                                             $character = $doctrine->getRepository(Character::class)->findOneBy([
-                                                'name' => $SWApiChar->name
+                                                'apiUrl' => $SWApiChar->url
                                             ]);
                                             if(!$character){
                                                 $character = new Character();

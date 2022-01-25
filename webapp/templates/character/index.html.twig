@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <h1 class="title">STAR WARS CHARACTER LIST</h1>
+    <div class="columns is-multiline is-desktop is-vcentered is-centered">
+        {% for character in characters %}
+            <div class="column is-one-fifth">
+                <a href="{{ path('character_single', {id: character.id}) }}">
+                    <div class="card">
+                        <div class="card-image">
+                            <figure class="image is-4by3">
+                                <img src="https://picsum.photos/1280/960?random={{ loop.index }}" alt="Placeholder image">
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <p class="title is-4">{{ character.name }}</p>
+                            <p class="subtitle is-6">{{ character.gender }}</p>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        {% endfor %}
+    </div>
+    <div class="buttons has-addons is-centered">
+        <a class="button" {% if page <= 1 %}disabled{% endif %} href="{{ path('characters_page', { page: page-1 }) }}">Prev</a>
+        <a class="button" href="{{ path('characters_page', { page: page+1 }) }}">Next</a>
+    </div>
+{% endblock %}

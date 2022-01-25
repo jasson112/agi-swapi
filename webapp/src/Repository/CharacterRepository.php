@@ -27,6 +27,20 @@ class CharacterRepository extends ServiceEntityRepository
         return $query;
     }
 
+    /**
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findFilms($id){
+        return $this->createQueryBuilder('f')
+            ->select('f', 'c')
+            ->leftJoin("f.films", "c")
+            ->andWhere('f.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getOneOrNullResult();
+    }
+
     // /**
     //  * @return Character[] Returns an array of Character objects
     //  */
